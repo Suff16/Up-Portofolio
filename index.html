@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofolio Yusuf Saputrah - Front-End Developer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        .gsap-reveal { /* Kelas ini bisa Anda gunakan untuk elemen generik yang ingin di-reveal */
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px) rotateX(-90deg);
+            transform-origin: bottom center;
+        }
+        .clickable-item {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            /* Untuk efek tilt */
+            transform-style: preserve-3d; 
+        }
+        .clickable-item:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15), 0 6px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+        .tech-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .tech-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        #mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+        }
+        /* Tambahan untuk efek tilt pada card */
+        .project-card, .certificate-card {
+            will-change: transform; /* Optimasi performa untuk transform */
+        }
+
+        /* Animasi untuk label form */
+        .form-field input:focus + label,
+        .form-field textarea:focus + label,
+        .form-field input:valid + label, /* Jika input sudah terisi dan valid */
+        .form-field textarea:valid + label {
+            /* Anda bisa definisikan style label saat aktif di sini, jika ingin animasi GSAP pada labelnya */
+        }
+
+        /* Animasi garis bawah link navbar */
+        .nav-links a::after, .mobile-nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px; /* Sesuaikan posisi */
+            width: 0;
+            height: 2px;
+            background-color: #4f46e5; /* Warna indigo-600 */
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover::after, .mobile-nav-links a:hover::after {
+            width: 100%;
+        }
+        .nav-links a.active-link::after { /* Untuk menandai link aktif dengan GSAP nantinya */
+             width: 100%;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div>
+                    <a href="#" id="nav-logo" class="text-2xl font-bold text-gray-800 lg:text-3xl hover:text-indigo-600 transition-colors duration-300">Yusuf Saputrah</a>
+                </div>
+                <div class="hidden md:block">
+                    <ul class="flex items-center space-x-6 nav-links">
+                        <li><a href="#home" class="nav-item text-gray-600 hover:text-indigo-600 py-2 relative">Home</a></li>
+                        <li><a href="#tech-stack" class="nav-item text-gray-600 hover:text-indigo-600 py-2 relative">Tech Stack</a></li>
+                        <li><a href="#projects" class="nav-item text-gray-600 hover:text-indigo-600 py-2 relative">Projects</a></li>
+                        <li><a href="#certificates" class="nav-item text-gray-600 hover:text-indigo-600 py-2 relative">Certificates</a></li>
+                        <li><a href="#contact" class="nav-item text-gray-600 hover:text-indigo-600 py-2 relative">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-600 focus:outline-none p-1">
+                        <svg id="menu-icon-open" class="w-6 h-6 transition-transform duration-300 ease-in-out" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                        <svg id="menu-icon-close" class="w-6 h-6 hidden transition-transform duration-300 ease-in-out" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="md:hidden mt-3">
+                <ul class="flex flex-col space-y-1 mobile-nav-links">
+                    <li><a href="#home" class="block px-3 py-2 text-gray-600 hover:bg-indigo-500 hover:text-white rounded transition-colors duration-200 relative">Home</a></li>
+                    <li><a href="#tech-stack" class="block px-3 py-2 text-gray-600 hover:bg-indigo-500 hover:text-white rounded transition-colors duration-200 relative">Tech Stack</a></li>
+                    <li><a href="#projects" class="block px-3 py-2 text-gray-600 hover:bg-indigo-500 hover:text-white rounded transition-colors duration-200 relative">Projects</a></li>
+                    <li><a href="#certificates" class="block px-3 py-2 text-gray-600 hover:bg-indigo-500 hover:text-white rounded transition-colors duration-200 relative">Certificates</a></li>
+                    <li><a href="#contact" class="block px-3 py-2 text-gray-600 hover:bg-indigo-500 hover:text-white rounded transition-colors duration-200 relative">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="min-h-screen flex items-center bg-white overflow-hidden"> 
+        <div class="container mx-auto px-6 py-12">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="md:w-1/2 mb-10 md:mb-0 text-center md:text-left">
+                    <h1 id="home-title" class="text-4xl lg:text-6xl font-bold text-gray-800 mb-4">Yusuf Saputrah</h1>
+                    <p id="frontend-text-container" class="text-xl lg:text-2xl text-indigo-600 font-semibold mb-6">
+                        
+                    </p>
+                    <p id="home-description" class="text-gray-600 mb-8 leading-relaxed">
+                      Front-end developer & freelancer | Informatics Engineering student | Focused on clean, responsive, user-centered design.
+                    </p>
+                    <a id="home-cta" href="#projects" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition duration-300 inline-block shadow-md hover:shadow-lg transform hover:-translate-y-0.5">Lihat Proyek Saya</a>
+                </div>
+                <div class="md:w-1/2 flex justify-center md:justify-end">
+                    <img id="home-image" src="./images/WhatsApp Image 2025-02-11 at 21.56.51_f57ea0db.jpg" alt="Foto Yusuf Saputrah" class="rounded-full shadow-2xl w-64 h-64 md:w-80 md:h-80 object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tech-stack" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold text-center text-gray-800 mb-16">Tech Stack Saya 💻</h2>
+            <div id="tech-stack-container" class="flex flex-wrap justify-center items-center gap-6 md:gap-8">
+               
+                <div class="tech-item bg-white p-4 rounded-lg shadow-md flex items-center space-x-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" class="h-8 w-8 md:h-10 md:w-10"/>
+                    <span class="text-gray-700 font-medium text-sm md:text-base">HTML5</span>
+                </div>
+                <div class="tech-item bg-white p-4 rounded-lg shadow-md flex items-center space-x-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3" class="h-8 w-8 md:h-10 md:w-10"/>
+                    <span class="text-gray-700 font-medium text-sm md:text-base">CSS3</span>
+                </div>
+                <div class="tech-item bg-white p-4 rounded-lg shadow-md flex items-center space-x-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" class="h-8 w-8 md:h-10 md:w-10"/>
+                    <span class="text-gray-700 font-medium text-sm md:text-base">JavaScript</span>
+                </div>
+                <div class="tech-item bg-white p-4 rounded-lg shadow-md flex items-center space-x-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React" class="h-8 w-8 md:h-10 md:w-10"/>
+                    <span class="text-gray-700 font-medium text-sm md:text-base">React</span>
+                </div>
+                <div class="tech-item bg-white p-4 rounded-lg shadow-md flex items-center space-x-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" class="h-8 w-8 md:h-10 md:w-10"/>
+                    <span class="text-gray-700 font-medium text-sm md:text-base">Node.js</span>
+                </div>
+                 <div class="tech-item bg-white p-4 rounded-lg shadow-md flex items-center space-x-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" class="h-8 w-8 md:h-10 md:w-10"/>
+                    <span class="text-gray-700 font-medium text-sm md:text-base">Git</span>
+                </div>
+                <div class="tech-item bg-white p-4 rounded-lg shadow-md flex items-center space-x-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma" class="h-8 w-8 md:h-10 md:w-10"/>
+                    <span class="text-gray-700 font-medium text-sm md:text-base">Figma</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold text-center text-gray-800 mb-12">Proyek Saya 🚀</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="project-card clickable-item bg-gray-50 rounded-lg shadow-xl overflow-hidden">
+                    <img src="./images/quran.jpg" alt="Nama Proyek 1" class="w-full h-56 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">AL-Qur'an Digital</h3>
+                        <p class="text-gray-600 text-sm mb-4">Al-Qur'an digital untuk umat muslim.</p>
+                        <a href="https://app-quran.netlify.app/" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium">Lihat Detail</a>
+                    </div>
+                </div>
+                <div class="project-card clickable-item bg-gray-50 rounded-lg shadow-xl overflow-hidden">
+                    <img src="./images/olshop.png" alt="Nama Proyek 2" class="w-full h-56 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Dummy Online Shop</h3>
+                        <p class="text-gray-600 text-sm mb-4">Project Dumy Online Shop menggunakn sistem payment Gateway</p>
+                        <a href="https://jekyllsimplecart.pages.dev/" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-medium">Lihat Detail</a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <section id="certificates" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold text-center text-gray-800 mb-12">Sertifikat Saya 📜</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="certificate-card clickable-item bg-white p-6 rounded-lg shadow-xl text-center">
+                    <img src="./images/Screenshot 2025-05-18 191455.png" alt="Sertifikat Fundamental Front-End" class="w-full h-40 object-contain mb-4 rounded">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">Fundamental Front-End</h3>
+                    <p class="text-gray-600 text-sm">Dikeluarkan oleh: DICODING INDONESIA</p>
+                    <a href="https://www.dicoding.com/certificates/KEXL7DV00XG2" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium mt-2 inline-block">Lihat Sertifikat</a>
+                </div>
+                 <div class="certificate-card clickable-item bg-white p-6 rounded-lg shadow-xl text-center">
+                    <img src="./images/sql.png" alt="Sertifikat Belajar Dasar SQL" class="w-full h-40 object-contain mb-4 rounded">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">Belajar Dasar Structured Query Language (SQL)</h3>
+                    <p class="text-gray-600 text-sm">Dikeluarkan oleh: DICODING INDONESIA</p>
+                    <a href="https://www.dicoding.com/certificates/0LZ0RVYNNP65" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium mt-2 inline-block">Lihat Sertifikat</a>
+                </div>
+                <div class="certificate-card clickable-item bg-white p-6 rounded-lg shadow-xl text-center">
+                    <img src="./images/codepolitan.png" alt="Sertifikat Implementasi Mongo DB" class="w-full h-40 object-contain mb-4 rounded">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">Implementasi Mongo DB di JavaScript</h3>
+                    <p class="text-gray-600 text-sm">Dikeluarkan oleh: CODEPOLITAN</p>
+                    <a href="https://codepolitan.com/c/NPX8KZH" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium mt-2 inline-block">Lihat Sertifikat</a>
+                </div>
+                <div class="certificate-card clickable-item bg-white p-6 rounded-lg shadow-xl text-center">
+                    <img src="./images/express.png" alt="Sertifikat Belajar Express.js" class="w-full h-40 object-contain mb-4 rounded">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">Belajar Express.js</h3>
+                    <p class="text-gray-600 text-sm">Dikeluarkan oleh: CODEPOLITAN</p>
+                    <a href="https://codepolitan.com/c/VBX8IG2" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium mt-2 inline-block">Lihat Sertifikat</a>
+                </div>
+                <div class="certificate-card clickable-item bg-white p-6 rounded-lg shadow-xl text-center">
+                    <img src="./images/datas.png" alt="Sertifikat Belajar Data Sains" class="w-full h-40 object-contain mb-4 rounded">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">Belajar Data Sains</h3>
+                    <p class="text-gray-600 text-sm">Dikeluarkan oleh: DICODING INDONESIA</p>
+                    <a href="https://www.dicoding.com/certificates/1OP82VMV2PQK" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium mt-2 inline-block">Lihat Sertifikat</a>
+                </div>
+                <div class="certificate-card clickable-item bg-white p-6 rounded-lg shadow-xl text-center">
+                    <img src="./images/cloud.png" alt="Sertifikat Cloud Practitioner Essentials (AWS)" class="w-full h-40 object-contain mb-4 rounded">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">Cloud Practitioner Essentials(AWS)</h3>
+                    <p class="text-gray-600 text-sm">Dikeluarkan oleh: DICODING INDONESIA</p>
+                    <a href="https://www.dicoding.com/certificates/53XEDNO7VPRN" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium mt-2 inline-block">Lihat Sertifikat</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold text-center text-gray-800 mb-4">Mari Berkolaborasi🤝</h2>
+            <p id="contact-intro" class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+                Punya ide proyek atau ingin bekerja sama? Isi formulir di bawah atau kirim email langsung.
+            </p>
+            <form id="contact-form" action="#" method="POST" class="max-w-xl mx-auto bg-gray-50 p-8 rounded-lg shadow-lg">
+                <div class="mb-6 form-field relative"> 
+                    <input type="text" id="name" name="name" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow duration-200 peer" placeholder="Nama Lengkap">
+                    <label for="name" class="absolute left-4 top-3.5 text-gray-500 transition-all duration-300 pointer-events-none peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-600 peer-valid:-top-2.5 peer-valid:text-xs peer-valid:text-indigo-600 bg-gray-50 px-1" ></label>
+                </div>
+                <div class="mb-6 form-field relative">
+                    <input type="email" id="email" name="email" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow duration-200 peer" placeholder="Alamat Email">
+                     <label for="email" class="absolute left-4 top-3.5 text-gray-500 transition-all duration-300 pointer-events-none peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-600 peer-valid:-top-2.5 peer-valid:text-xs peer-valid:text-indigo-600 bg-gray-50 px-1"></label>
+                </div>
+                <div class="mb-8 form-field relative"> 
+                    <textarea id="message" name="message" rows="5" required
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow duration-200 peer resize-none" placeholder="Pesan Anda"></textarea>
+                    <label for="message" class="absolute left-4 top-3.5 text-gray-500 transition-all duration-300 pointer-events-none peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-indigo-600 peer-valid:-top-2.5 peer-valid:text-xs peer-valid:text-indigo-600 bg-gray-50 px-1"></label>
+                </div>
+                <div class="text-center form-field">
+                    <button type="submit" id="submit-button"
+                            class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                        Kirim Pesan
+                    </button>
+                </div>
+                 <p class="text-center text-gray-600 mt-8 text-sm form-field"> 
+                    Atau hubungi saya langsung di: <a href="mailto:yusuf@gmail.com" class="text-indigo-600 hover:underline">yusufsaputrah003@gmail.com</a>
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-8 text-center">
+        <p id="footer-text">&copy; <span id="currentYear"></span> Yusuf Saputrah. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // --- Inisialisasi Mobile Menu ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIconOpen = document.getElementById('menu-icon-open');
+            const menuIconClose = document.getElementById('menu-icon-close');
+            let isMenuOpen = false;
+            const mobileMenuHeight = mobileMenu.scrollHeight;
+            gsap.set(mobileMenu, { maxHeight: 0 });
+
+            mobileMenuButton.addEventListener('click', () => {
+                isMenuOpen = !isMenuOpen;
+                if (isMenuOpen) {
+                    gsap.to(mobileMenu, { maxHeight: mobileMenuHeight, duration: 0.4, ease: "power2.out" });
+                    menuIconOpen.classList.add('hidden');
+                    menuIconClose.classList.remove('hidden');
+                    gsap.fromTo(menuIconClose, {rotate: -90, opacity: 0}, {rotate: 0, opacity:1, duration: 0.3});
+                } else {
+                    gsap.to(mobileMenu, { maxHeight: 0, duration: 0.4, ease: "power2.in" });
+                    menuIconOpen.classList.remove('hidden');
+                    menuIconClose.classList.add('hidden');
+                    gsap.fromTo(menuIconOpen, {rotate: 90, opacity: 0}, {rotate: 0, opacity:1, duration: 0.3});
+                }
+            });
+
+            document.querySelectorAll('.mobile-nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (isMenuOpen) {
+                        gsap.to(mobileMenu, { maxHeight: 0, duration: 0.4, ease: "power2.in" });
+                        menuIconOpen.classList.remove('hidden');
+                        menuIconClose.classList.add('hidden');
+                        isMenuOpen = false;
+                    }
+                });
+            });
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            // --- Animasi Global ---
+            const revealElements = gsap.utils.toArray('.gsap-reveal');
+            revealElements.forEach(el => {
+                gsap.fromTo(el,
+                    { opacity: 0, y: 30 },
+                    {
+                        opacity: 1, y: 0, duration: 0.8, ease: "power3.out",
+                        scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none none" }
+                    }
+                );
+            });
+
+            // --- Animasi Navbar ---
+            gsap.from("#nav-logo", { opacity:0, x:-30, duration:0.8, delay:0.2, ease:"power3.out"});
+            gsap.from(".nav-links .nav-item", {
+                opacity: 0,
+                y: -20,
+                duration: 0.5,
+                stagger: 0.15, // Animasi satu per satu
+                delay: 0.4, // Mulai setelah logo
+                ease: "power2.out"
+            });
+
+            // --- Animasi Hero Section ---
+            const feTextContainer = document.getElementById('frontend-text-container');
+            const feText = "Front-End Developer";
+            feText.split("").forEach(char => {
+                const span = document.createElement("span");
+                span.className = "char";
+                span.textContent = char === " " ? "\u00A0" : char; // \u00A0 untuk spasi non-breaking
+                feTextContainer.appendChild(span);
+            });
+
+            const homeTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+            homeTl.fromTo("#home-title", { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 1, delay: 0.5 }) // Sedikit delay untuk navbar dulu
+                  .fromTo("#frontend-text-container .char",
+                      { opacity: 0, y: 25, rotateX: -100, transformOrigin: "bottom center" }, // Efek lebih dramatis
+                      { opacity: 1, y: 0, rotateX: 0, duration: 0.8, stagger: 0.04, ease: "back.out(1.4)", delay: -0.6 }
+                  )
+                  .fromTo("#home-description", { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 1, delay: -0.5 })
+                  .fromTo("#home-cta", { opacity: 0, y: 30, scale:0.7 }, { opacity: 1, y: 0, scale:1, duration: 1, ease: "elastic.out(1, 0.65)", delay: -0.3 })
+                  .fromTo("#home-image", { opacity: 0, scale: 0.6, rotation: -20 }, { opacity: 1, scale: 1, rotation: 0, duration: 1.2, ease: "elastic.out(1, 0.65)", delay: -0.8 });
+
+            // Animasi "pulse" lembut pada tombol CTA
+            gsap.to("#home-cta", {
+                scale: 1.05,
+                duration: 1.5,
+                repeat: -1, // Ulangi tak terbatas
+                yoyo: true, // Kembali ke state awal
+                ease: "sine.inOut",
+                delay: 2 // Mulai setelah animasi utama hero selesai
+            });
+
+
+            // --- Animasi Judul Section ---
+            gsap.utils.toArray('.section-title').forEach(title => {
+                gsap.fromTo(title,
+                    { opacity: 0, y: 60, rotationX: -30, transformOrigin:"bottom center" }, // Efek 3D sedikit
+                    {
+                        opacity: 1, y: 0, rotationX: 0, duration: 1, ease: "power3.out",
+                        scrollTrigger: { trigger: title, start: "top 85%", toggleActions: "play none none restart" } // Restart jika scroll kembali ke atas lalu ke bawah lagi
+                    }
+                );
+            });
+
+            // --- Animasi Tech Stack ---
+            gsap.fromTo(".tech-item",
+                { opacity: 0, y: 50, scale: 0.7, rotationZ: (i) => (i % 2 === 0 ? -15 : 15) }, // Efek masuk dari samping dengan rotasi
+                {
+                    opacity: 1, y: 0, scale: 1, rotationZ: 0, duration: 0.6,
+                    stagger: {
+                        amount: 0.5, // Total durasi stagger
+                        from: "center", // Mulai dari tengah
+                        ease: "power2.out"
+                    },
+                    scrollTrigger: { trigger: "#tech-stack-container", start: "top 85%", toggleActions: "play none none restart" }
+                }
+            );
+
+            // --- Animasi Project & Certificate Cards ---
+            const cards = gsap.utils.toArray('.project-card, .certificate-card');
+            cards.forEach((card, index) => {
+                gsap.fromTo(card,
+                    { opacity: 0, y: 70, rotationX: -45, transformOrigin: "center top" }, // Efek "jatuh" lebih jelas
+                    {
+                        opacity: 1, y: 0, rotationX: 0, duration: 0.8, ease: "power2.out",
+                        scrollTrigger: { trigger: card, start: "top 90%", toggleActions: "play none none restart" } // restart agar animasi main lagi jika user scroll up/down
+                    }
+                );
+
+                // Efek Tilt pada Hover (jika Anda mau)
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    const rotateX = (y / rect.height) * -10; // Max 5 derajat tilt
+                    const rotateY = (x / rect.width) * 10;  // Max 5 derajat tilt
+
+                    gsap.to(card, {
+                        rotationX: rotateX,
+                        rotationY: rotateY,
+                        transformPerspective: 1000, // Penting untuk efek 3D
+                        ease: "power1.out",
+                        duration: 0.4
+                    });
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, {
+                        rotationX: 0,
+                        rotationY: 0,
+                        ease: "power1.out",
+                        duration: 0.5
+                    });
+                });
+            });
+            
+            // --- Animasi Form Kontak ---
+            gsap.fromTo("#contact-intro",
+                { opacity: 0, y: 30 },
+                { opacity: 1, y: 0, duration: 0.8, scrollTrigger: { trigger: "#contact-intro", start: "top 90%" } }
+            );
+
+            // Animasi untuk form fields (dengan stagger)
+            const formFields = gsap.utils.toArray('#contact-form .form-field');
+            gsap.fromTo(formFields,
+                { opacity: 0, y: 40 },
+                {
+                    opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
+                    stagger: 0.15, // Setiap field muncul berurutan
+                    scrollTrigger: { trigger: "#contact-form", start: "top 85%", toggleActions: "play none none restart" }
+                }
+            );
+
+            // Animasi tombol submit form
+            const submitButton = document.getElementById('submit-button');
+            submitButton.addEventListener('mouseenter', () => {
+                gsap.to(submitButton, { scale: 1.05, duration: 0.2, ease: "power1.out" });
+            });
+            submitButton.addEventListener('mouseleave', () => {
+                gsap.to(submitButton, { scale: 1, duration: 0.2, ease: "power1.out" });
+            });
+
+
+            // --- Efek Klik Lebih Jelas (tambahan dari kode Anda, sedikit modifikasi) ---
+            document.querySelectorAll('.clickable-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' || e.target.closest('A')) {
+                        return; 
+                    }
+                    gsap.fromTo(item, 
+                        { scale: 1, y:0 },
+                        { 
+                            scale: 0.96, 
+                            y: 4,        
+                            boxShadow: "0 3px 6px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06)",
+                            duration: 0.15, 
+                            yoyo: true, 
+                            repeat: 1, 
+                            ease: "power2.inOut"
+                        }
+                    );
+                });
+            });
+
+            // --- Animasi Footer ---
+            gsap.fromTo("#footer-text",
+                { opacity: 0, y: 20 },
+                {
+                    opacity: 1, y: 0, duration: 1, ease: "power3.out",
+                    scrollTrigger: { trigger: "footer", start: "top 95%", toggleActions: "play none none none" }
+                }
+            );
+
+            // --- Active Link Highlighting on Scroll ---
+            const sections = gsap.utils.toArray("section");
+            const navLinks = gsap.utils.toArray(".nav-links .nav-item, .mobile-nav-links a");
+
+            sections.forEach(section => {
+                ScrollTrigger.create({
+                    trigger: section,
+                    start: "top center+=100", // Sedikit offset
+                    end: "bottom center-=100",
+                    onEnter: () => setActiveLink(section.id),
+                    onEnterBack: () => setActiveLink(section.id),
+                    // onLeave: () => clearActiveLink(section.id), // Optional
+                    // onLeaveBack: () => clearActiveLink(section.id) // Optional
+                });
+            });
+
+            function setActiveLink(sectionId) {
+                navLinks.forEach(link => {
+                    if (link.getAttribute("href") === `#${sectionId}`) {
+                        link.classList.add("active-link", "text-indigo-600", "font-semibold");
+                        gsap.to(link.querySelectorAll('::after'), { width: "100%", duration: 0.3, ease: "power2.out" });
+                    } else {
+                        link.classList.remove("active-link", "text-indigo-600", "font-semibold");
+                        gsap.to(link.querySelectorAll('::after'), { width: "0%", duration: 0.3, ease: "power2.out" });
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
